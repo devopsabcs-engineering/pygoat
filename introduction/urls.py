@@ -1,8 +1,7 @@
-from django.urls import include, path
+from django.urls import path,include
 
+from .import views, apis, mitre
 from introduction.playground.A9.api import log_function_target
-
-from . import apis, mitre, views
 
 urlpatterns = [
     path('accounts/', include('allauth.urls')),

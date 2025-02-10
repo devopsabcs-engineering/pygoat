@@ -9,3 +9,4 @@ app.log
 bin
 /data/db
 /.vs
+pygoatvenv/

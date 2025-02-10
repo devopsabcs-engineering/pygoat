@@ -1,6 +1,4 @@
 import datetime
-
-
 # f = open('test.log', 'a') --> use this file to log
 class Log:
     def __init__(self,request):
