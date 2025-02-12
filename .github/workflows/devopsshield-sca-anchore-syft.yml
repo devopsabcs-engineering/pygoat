@@ -1,0 +1,60 @@
+# Last applied at: Wed, 12 Feb 2025 03:35:10 GMT
+# DevOps Shield - The ultimate DevSecOps platform designed to secure your DevOps.
+# https://devopsshield.com
+##############################################################
+# This is a DevOps Shield - Application Security - Code Security Template. 
+
+# This workflow template uses actions that are not certified by DevOps Shield. 
+# They are provided by a third-party and are governed by separate terms of service, privacy policy, and support documentation.
+
+# Use this workflow template for integrating code security into your pipelines and workflows.
+
+# DevOps Shield Workflow Template Details:
+# ------------------------------------------------------------
+# Code: GH_SCA_ANCHORE_SYFT
+# Name: Anchore Syft SBOM Scan
+# DevSecOpsControls: SCA
+# Provider: Anchore
+# Categories: Code Scanning, Dockerfile, Dependency Management
+# Description: 
+# Produce Software Bills of Materials based on Anchore's open source Syft tool.
+# Syft is a powerful and easy-to-use open-source tool for generating Software Bill of Materials (SBOMs) for container images and filesystems. 
+# It provides detailed visibility into the packages and dependencies in your software, helping you manage vulnerabilities, license compliance, and software supply chain security.
+# This workflow checks out code, builds an image, performs a container image
+# scan with Anchore's Syft tool, and uploads the results to the GitHub Dependency submission API.
+# Read the official documentation to find out more. 
+# For more information: 
+# https://github.com/anchore/syft
+# ------------------------------------------------------------
+# Source repository: https://github.com/anchore/sbom-action
+##############################################################
+
+name: Anchore Syft SBOM Scan
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  anchore-syft-Scan:
+    name: Anchore Syft SBOM Scan
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write # required to upload to the Dependency submission API
+      actions: read # to find workflow artifacts when attaching release assets
+
+    steps:      
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag localbuild/testimage:latest
+
+    - name: Scan the image and upload dependency results
+      uses: anchore/sbom-action@v0
+      with:
+        image: "localbuild/testimage:latest"
+        artifact-name: image.spdx.json
+        dependency-snapshot: true
