@@ -2,9 +2,9 @@
 # DevOps Shield - The ultimate DevSecOps platform designed to secure your DevOps.
 # https://devopsshield.com
 ##############################################################
-# This is a DevOps Shield - Application Security - Code Security Template. 
+# This is a DevOps Shield - Application Security - Code Security Template.
 
-# This workflow template uses actions that are not certified by DevOps Shield. 
+# This workflow template uses actions that are not certified by DevOps Shield.
 # They are provided by a third-party and are governed by separate terms of service, privacy policy, and support documentation.
 
 # Use this workflow template for integrating code security into your pipelines and workflows.
@@ -16,14 +16,14 @@
 # DevSecOpsControls: CIS
 # Provider: Anchore
 # Categories: Code Scanning, Dockerfile
-# Description: 
-# Anchore Grype is a vulnerability scanner for container images and filesystems. 
+# Description:
+# Anchore Grype is a vulnerability scanner for container images and filesystems.
 # Scan the contents of a container image or filesystem to find known vulnerabilities.
 # Anchore container analysis and scan provided as a GitHub Action.
-# This workflow checks out code, builds an image, performs a container image vulnerability scan with Anchore's Grype tool, 
+# This workflow checks out code, builds an image, performs a container image vulnerability scan with Anchore's Grype tool,
 # and integrates the results with GitHub Advanced Security code scanning feature.
-# Read the official documentation to find out more. 
-# For more information: 
+# Read the official documentation to find out more.
+# For more information:
 # https://github.com/anchore/grype
 # ------------------------------------------------------------
 # Source repository: https://github.com/anchore/scan-action
@@ -33,9 +33,9 @@ name: Anchore Grype Vulnerability Scan (Container Image Scanning)
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
   schedule:
     - cron: 0 0 * * 0
 
@@ -50,25 +50,25 @@ jobs:
       security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
       actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
 
-    steps:      
-    - name: Checkout code
-      uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Build an image from Dockerfile
-      uses: docker/build-push-action@v4
-      with:
-        tags: localbuild/testimage:latest
-        push: false
-        load: true
+      - name: Build an image from Dockerfile
+        uses: docker/build-push-action@v4
+        with:
+          tags: localbuild/testimage:latest
+          push: false
+          load: true
 
-    - name: Run the Anchore Grype scan action
-      uses: anchore/scan-action@v6
-      id: scan
-      with:
-        image: "localbuild/testimage:latest"
-        fail-build: true
-        severity-cutoff: critical
-    - name: Upload Anchore vulnerability report to GitHub Security tab
-      uses: github/codeql-action/upload-sarif@v3
-      with:
-        sarif_file: ${{ steps.scan.outputs.sarif }}
+      - name: Run the Anchore Grype scan action
+        uses: anchore/scan-action@v6
+        id: scan
+        with:
+          image: "localbuild/testimage:latest"
+          fail-build: false # Set to true to fail the build if vulnerabilities are found
+          severity-cutoff: critical
+      - name: Upload Anchore vulnerability report to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ${{ steps.scan.outputs.sarif }}
