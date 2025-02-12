@@ -71,6 +71,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: kubesec-results
+          path: kubesec-results.sarif
       # upload artifact to GitHub Security tab
       - name: Upload Kubesec scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
