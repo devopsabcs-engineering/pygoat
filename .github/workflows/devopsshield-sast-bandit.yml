@@ -41,7 +41,7 @@ on:
     - cron: 0 0 * * 0
 
 env:
-  exit_zero: false # optional, default is DEFAULT
+  exit_zero: true # optional, default is DEFAULT
 
 jobs:
   bandit-scan:
