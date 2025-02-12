@@ -41,6 +41,8 @@ on:
 
 env:
   manifest_path: "manifests/insecure-pod.yaml" # specify configuration file to scan here
+  report_file: "kubesec-results"
+  artifact_name: "kubesec-artifacts"
 
 jobs:
   kubesec-scan:
@@ -56,22 +58,45 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Get sarif.tpl
+
+      - name: Download SARIF template
         run: wget https://raw.githubusercontent.com/bsanchezmir/kubesec-action/main/sarif.tpl
-      - name: Run kubesec scanner
-        uses: controlplaneio/kubesec-action@43d0ddff5ffee89a6bb9f29b64cd865411137b14 #v0.0.2
-        with:
-          input: ${{ env.manifest_path }}
-          format: template
-          template: template/sarif.tpl
-          output: kubesec-results.sarif
-          exit-code: "0"
-      # upload artifact
+
+      - name: Install Kubesec
+        run: |
+          echo "installing kubesec"
+          curl -LO https://github.com/controlplaneio/kubesec/releases/latest/download/kubesec_linux_amd64.tar.gz
+          tar xzvf kubesec_linux_amd64.tar.gz
+          ls -la
+          chmod +x kubesec
+          sudo mv kubesec /usr/local/bin/kubesec
+
+      - name: Scan Kubernetes Manifests with Kubesec
+        run: |
+          echo "kubesec version"
+          kubesec version
+          kubesec scan ${{ env.manifest_path }} > ${{ github.workspace }}/${{ env.report_file }}.json
+          cat ${{ github.workspace }}/${{ env.report_file }}.json
+
+      - name: Convert Kubesec scan results to SARIF format
+        run: |
+          echo "Converting Kubesec scan results to SARIF format"
+          kubesec version
+          echo "using template"
+          cat sarif.tpl
+          echo "running kubesec scan"
+          fileOutput=${{ github.workspace }}/${{ env.report_file }}.sarif
+          echo "fileOutput: $fileOutput"
+          kubesec scan ${{ env.manifest_path }} --format template --template sarif.tpl > $fileOutput
+          ls -la
+          cat $fileOutput
+
       - name: Upload Kubesec scan results as an artifact
         uses: actions/upload-artifact@v4
         with:
-          name: kubesec-results
-          path: kubesec-results.sarif
+          name: ${{ env.artifact_name }}
+          path: ${{ github.workspace }}/${{ env.report_file }}.sarif
+
       # upload artifact to GitHub Security tab
       - name: Upload Kubesec scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
