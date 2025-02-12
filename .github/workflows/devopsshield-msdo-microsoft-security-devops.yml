@@ -1,0 +1,75 @@
+# Last applied at: Wed, 12 Feb 2025 15:48:29 GMT
+# DevOps Shield - The ultimate DevSecOps platform designed to secure your DevOps.
+# https://devopsshield.com
+##############################################################
+# This is a DevOps Shield - Application Security - Code Security Template. 
+
+# This workflow template uses actions that are not certified by DevOps Shield. 
+# They are provided by a third-party and are governed by separate terms of service, privacy policy, and support documentation.
+
+# Use this workflow template for integrating code security into your pipelines and workflows.
+
+# DevOps Shield Workflow Template Details:
+# ------------------------------------------------------------
+# Code: GH_MSDO_Microsoft_Security_DevOps
+# Name: Microsoft Security DevOps (MSDO) - Defender for DevOps
+# DevSecOpsControls: SAST, CIS, IACS
+# Provider: Microsoft
+# Categories: Code Scanning, Dockerfile, Python, JavaScript, EcmaScript, TypeScript, C#, .NET, ARM Template, Bicep, Kubernetes, JSON, YAML, CloudFormation, HCL, Terraform
+# Description: 
+# Microsoft Security DevOps (MSDO) is a command line application which integrates static analysis tools into the development cycle. 
+# MSDO installs, configures and runs the latest versions of static analysis tools (including, but not limited to, SDL/security and compliance tools). 
+# Defender for DevOps helps integrate multiple tools with Advanced Security and sends the results to Defender for Cloud dashboard. 
+# Please note this workflow do not integrate with Microsoft Defender For DevOps. 
+# You have to create an integration and provide permission before this can report data back to Azure. 
+# Read the official documentation to find out more. 
+# For more information: 
+# https://github.com/microsoft/security-devops-action
+# https://learn.microsoft.com/en-us/azure/defender-for-cloud/github-action
+# https://learn.microsoft.com/en-us/azure/defender-for-cloud/quickstart-onboard-github
+# ------------------------------------------------------------
+# Source repository: https://github.com/microsoft/security-devops-action
+##############################################################
+
+name: Microsoft Security DevOps (MSDO) - Defender for DevOps
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  schedule:
+    - cron: 0 0 * * 0
+
+jobs:
+  MSDO:
+    name: Microsoft Security DevOps (MSDO)
+
+    # Windows and Linux agents are supported
+    runs-on: windows-latest
+
+    permissions:
+      contents: read
+      # Write access for security-events is only required for customers looking for MSDO results to appear in the codeQL security alerts tab on GitHub (Requires GHAS)
+      security-events: write
+
+    steps:
+      # Checkout your code repository to scan
+    - uses: actions/checkout@v4
+
+      # Run analyzers
+    - name: Run Microsoft Security DevOps
+      uses: microsoft/security-devops-action@v1.6.0
+      id: msdo
+    # with:
+      # config: string. Optional. A file path to an MSDO configuration file ('*.gdnconfig').
+      # policy: 'GitHub' | 'microsoft' | 'none'. Optional. The name of a well-known Microsoft policy. If no configuration file or list of tools is provided, the policy may instruct MSDO which tools to run. Default: GitHub.
+      # categories: string. Optional. A comma-separated list of analyzer categories to run. Values: 'code', 'artifacts', 'IaC', 'containers'. Example: 'IaC, containers'. Defaults to all.
+      # languages: string. Optional. A comma-separated list of languages to analyze. Example: 'javascript,typescript'. Defaults to all.
+      # tools: string. Optional. A comma-separated list of analyzer tools to run. Values: 'bandit', 'binskim', 'checkov', 'eslint', 'templateanalyzer', 'terrascan', 'trivy'.
+
+      # Upload alerts to the Security tab - required for MSDO results to appear in the codeQL security alerts tab on GitHub (Requires GHAS)
+    - name: Upload results to Security tab
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: ${{ steps.msdo.outputs.sarifFile }}
