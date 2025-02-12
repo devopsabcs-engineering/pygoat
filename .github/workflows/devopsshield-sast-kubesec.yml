@@ -2,9 +2,9 @@
 # DevOps Shield - The ultimate DevSecOps platform designed to secure your DevOps.
 # https://devopsshield.com
 ##############################################################
-# This is a DevOps Shield - Application Security - Code Security Template. 
+# This is a DevOps Shield - Application Security - Code Security Template.
 
-# This workflow template uses actions that are not certified by DevOps Shield. 
+# This workflow template uses actions that are not certified by DevOps Shield.
 # They are provided by a third-party and are governed by separate terms of service, privacy policy, and support documentation.
 
 # Use this workflow template for integrating code security into your pipelines and workflows.
@@ -16,15 +16,15 @@
 # DevSecOpsControls: SAST
 # Provider: ControlPlane
 # Categories: Code Scanning, Kubernetes
-# Description: 
+# Description:
 # Security risk analysis for Kubernetes resources.
-# Kubesec is an open-source static analysis and security scanner tool for Kubernetes. 
-# It scans manifest configurations and validates them against predefined security criteria. 
+# Kubesec is an open-source static analysis and security scanner tool for Kubernetes.
+# It scans manifest configurations and validates them against predefined security criteria.
 # Kubesec can find misconfigurations in pods or deployments.
-# Read the official documentation to find out more. 
-# For more information: 
+# Read the official documentation to find out more.
+# For more information:
 # https://kubesec.io/
-# https://github.com/controlplaneio/kubesec 
+# https://github.com/controlplaneio/kubesec
 # ------------------------------------------------------------
 # Source repository: https://github.com/controlplaneio/kubesec-action
 ##############################################################
@@ -33,11 +33,14 @@ name: Kubesec Scanner
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
   schedule:
     - cron: 0 0 * * 0
+
+env:
+  manifest_path: "manifests/insecure-pod.yaml" # specify configuration file to scan here
 
 jobs:
   kubesec-scan:
@@ -50,20 +53,20 @@ jobs:
       security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
       actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
 
-    steps:      
-    - name: Checkout code
-      uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Run kubesec scanner
-      uses: controlplaneio/kubesec-action@43d0ddff5ffee89a6bb9f29b64cd865411137b14 #v0.0.2
-      with:
-        input: file.yaml # specify configuration file to scan here
-        format: template
-        template: template/sarif.tpl
-        output: kubesec-results.sarif
-        exit-code: "0"
+      - name: Run kubesec scanner
+        uses: controlplaneio/kubesec-action@43d0ddff5ffee89a6bb9f29b64cd865411137b14 #v0.0.2
+        with:
+          input: ${{ env.manifest_path }}
+          format: template
+          template: template/sarif.tpl
+          output: kubesec-results.sarif
+          exit-code: "0"
 
-    - name: Upload Kubesec scan results to GitHub Security tab
-      uses: github/codeql-action/upload-sarif@v3
-      with:
-        sarif_file: kubesec-results.sarif
+      - name: Upload Kubesec scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: kubesec-results.sarif
