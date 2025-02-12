@@ -43,6 +43,7 @@ env:
   manifest_path: "manifests/insecure-pod.yaml" # specify configuration file to scan here
   report_file: "kubesec-results"
   artifact_name: "kubesec-artifacts"
+  exit_code: "0" # specify exit code for failed scan (i.e. issues found)
 
 jobs:
   kubesec-scan:
@@ -87,7 +88,7 @@ jobs:
           echo "running kubesec scan"
           fileOutput=${{ github.workspace }}/${{ env.report_file }}.sarif
           echo "fileOutput: $fileOutput"
-          kubesec scan ${{ env.manifest_path }} --format template --template sarif.tpl > $fileOutput
+          kubesec scan --exit-code ${{ env.exit_code }} ${{ env.manifest_path }} --format template --template sarif.tpl > $fileOutput
           ls -la
           cat $fileOutput
 
