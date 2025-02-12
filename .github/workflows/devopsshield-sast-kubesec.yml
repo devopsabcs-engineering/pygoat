@@ -1,0 +1,105 @@
+# Last applied at: Wed, 12 Feb 2025 13:34:49 GMT
+# DevOps Shield - The ultimate DevSecOps platform designed to secure your DevOps.
+# https://devopsshield.com
+##############################################################
+# This is a DevOps Shield - Application Security - Code Security Template.
+
+# This workflow template uses actions that are not certified by DevOps Shield.
+# They are provided by a third-party and are governed by separate terms of service, privacy policy, and support documentation.
+
+# Use this workflow template for integrating code security into your pipelines and workflows.
+
+# DevOps Shield Workflow Template Details:
+# ------------------------------------------------------------
+# Code: GH_SAST_KUBESEC
+# Name: Kubesec Scanner
+# DevSecOpsControls: SAST
+# Provider: ControlPlane
+# Categories: Code Scanning, Kubernetes
+# Description:
+# Security risk analysis for Kubernetes resources.
+# Kubesec is an open-source static analysis and security scanner tool for Kubernetes.
+# It scans manifest configurations and validates them against predefined security criteria.
+# Kubesec can find misconfigurations in pods or deployments.
+# Read the official documentation to find out more.
+# For more information:
+# https://kubesec.io/
+# https://github.com/controlplaneio/kubesec
+# ------------------------------------------------------------
+# Source repository: https://github.com/controlplaneio/kubesec-action
+##############################################################
+
+name: Kubesec Scanner
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  schedule:
+    - cron: 0 0 * * 0
+
+env:
+  manifest_path: "manifests/insecure-pod.yaml" # specify configuration file to scan here
+  report_file: "kubesec-results"
+  artifact_name: "kubesec-artifacts"
+  exit_code: "0" # specify exit code for failed scan (i.e. issues found)
+
+jobs:
+  kubesec-scan:
+    name: Kubesec Scan
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read # for actions/checkout to fetch code
+      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+      actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download SARIF template
+        run: wget https://raw.githubusercontent.com/bsanchezmir/kubesec-action/main/sarif.tpl
+
+      - name: Install Kubesec
+        run: |
+          echo "installing kubesec"
+          curl -LO https://github.com/controlplaneio/kubesec/releases/latest/download/kubesec_linux_amd64.tar.gz
+          tar xzvf kubesec_linux_amd64.tar.gz
+          ls -la
+          chmod +x kubesec
+          sudo mv kubesec /usr/local/bin/kubesec
+
+      - name: Scan Kubernetes Manifests with Kubesec
+        run: |
+          echo "kubesec version"
+          kubesec version
+          kubesec scan --exit-code ${{ env.exit_code }} ${{ env.manifest_path }} > ${{ github.workspace }}/${{ env.report_file }}.json
+          cat ${{ github.workspace }}/${{ env.report_file }}.json
+
+      - name: Convert Kubesec scan results to SARIF format
+        run: |
+          echo "Converting Kubesec scan results to SARIF format"
+          kubesec version
+          echo "using template"
+          cat sarif.tpl
+          echo "running kubesec scan"
+          fileOutput=${{ github.workspace }}/${{ env.report_file }}.sarif
+          echo "fileOutput: $fileOutput"
+          kubesec scan --exit-code ${{ env.exit_code }} ${{ env.manifest_path }} --format template --template sarif.tpl > $fileOutput
+          ls -la
+          cat $fileOutput
+
+      - name: Upload Kubesec scan results as an artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.artifact_name }}
+          path: ${{ github.workspace }}/${{ env.report_file }}.sarif
+
+      # upload artifact to GitHub Security tab
+      - name: Upload Kubesec scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: kubesec-results.sarif
