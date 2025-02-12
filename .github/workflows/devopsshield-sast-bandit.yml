@@ -1,0 +1,79 @@
+# Last applied at: Wed, 12 Feb 2025 12:33:07 GMT
+# DevOps Shield - The ultimate DevSecOps platform designed to secure your DevOps.
+# https://devopsshield.com
+##############################################################
+# This is a DevOps Shield - Application Security - Code Security Template.
+
+# This workflow template uses actions that are not certified by DevOps Shield.
+# They are provided by a third-party and are governed by separate terms of service, privacy policy, and support documentation.
+
+# Use this workflow template for integrating code security into your pipelines and workflows.
+
+# DevOps Shield Workflow Template Details:
+# ------------------------------------------------------------
+# Code: GH_SAST_BANDIT
+# Name: Bandit Scan (Python)
+# DevSecOpsControls: SAST
+# Provider: PyCQA
+# Categories: Code Scanning, Python
+# Description:
+# Bandit is free software designed to find common security issues in Python code, maintained by PyCQA (Python Code Quality Authority).
+# Bandit is a tool designed to find common security issues in Python code.
+# To do this Bandit processes each file, builds an AST from it, and runs appropriate plugins against the AST nodes.
+# Once Bandit has finished scanning all the files it generates a report.
+# Read the official documentation to find out more.
+# For more information:
+# https://bandit.readthedocs.io/
+# https://github.com/PyCQA/bandit
+# ------------------------------------------------------------
+# Source repository: https://github.com/PyCQA/bandit
+# GitHub Action for Bandit SAST: https://github.com/marketplace/actions/bandit-scan
+##############################################################
+
+name: Bandit Scan (Python)
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  schedule:
+    - cron: 0 0 * * 0
+
+env:
+  exit_zero: true # optional, default is DEFAULT
+
+jobs:
+  bandit-scan:
+    name: Bandit Scan (Python)
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read # for actions/checkout to fetch code
+      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+      actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Bandit Scan
+        uses: shundor/python-bandit-scan@v1.0
+        with: # optional arguments
+          # exit with 0, even with results found
+          exit_zero: ${{ env.exit_zero }} # optional, default is DEFAULT
+          # Github token of the repository (automatically created by Github)
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information.
+          # File or directory to run bandit on
+          # path: # optional, default is .
+          # Report only issues of a given severity level or higher. Can be LOW, MEDIUM or HIGH. Default is UNDEFINED (everything)
+          # level: # optional, default is UNDEFINED
+          # Report only issues of a given confidence level or higher. Can be LOW, MEDIUM or HIGH. Default is UNDEFINED (everything)
+          # confidence: # optional, default is UNDEFINED
+          # comma-separated list of paths (glob patterns supported) to exclude from scan (note that these are in addition to the excluded paths provided in the config file) (default: .svn,CVS,.bzr,.hg,.git,__pycache__,.tox,.eggs,*.egg)
+          # excluded_paths: # optional, default is DEFAULT
+          # comma-separated list of test IDs to skip
+          # skips: # optional, default is DEFAULT
+          # path to a .bandit file that supplies command line arguments
+          # ini_path: # optional, default is DEFAULT
