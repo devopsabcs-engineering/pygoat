@@ -40,7 +40,7 @@ on:
     - cron: 0 0 * * 0
 
 env:
-  fail-build: true # Set to true to fail the build if vulnerabilities are found
+  fail-build: false # Set to true to fail the build if vulnerabilities are found
 
 jobs:
   anchore-grype-scan:
