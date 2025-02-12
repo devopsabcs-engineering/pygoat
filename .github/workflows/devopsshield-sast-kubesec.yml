@@ -76,7 +76,7 @@ jobs:
         run: |
           echo "kubesec version"
           kubesec version
-          kubesec scan ${{ env.manifest_path }} > ${{ github.workspace }}/${{ env.report_file }}.json
+          kubesec scan --exit-code ${{ env.exit_code }} ${{ env.manifest_path }} > ${{ github.workspace }}/${{ env.report_file }}.json
           cat ${{ github.workspace }}/${{ env.report_file }}.json
 
       - name: Convert Kubesec scan results to SARIF format
