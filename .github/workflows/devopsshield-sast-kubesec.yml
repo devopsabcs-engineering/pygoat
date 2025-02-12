@@ -44,6 +44,7 @@ env:
   report_file: "kubesec-results"
   artifact_name: "kubesec-artifacts"
   exit_code: "0" # specify exit code for failed scan (i.e. issues found)
+  template_file: "sarif.tpl"
 
 jobs:
   kubesec-scan:
@@ -61,7 +62,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Download SARIF template
-        run: wget https://raw.githubusercontent.com/bsanchezmir/kubesec-action/main/sarif.tpl
+        run: wget https://raw.githubusercontent.com/bsanchezmir/kubesec-action/main/${{ env.template_file }}
 
       - name: Install Kubesec
         run: |
@@ -84,11 +85,11 @@ jobs:
           echo "Converting Kubesec scan results to SARIF format"
           kubesec version
           echo "using template"
-          cat sarif.tpl
+          cat ${{ env.template_file }}
           echo "running kubesec scan"
           fileOutput=${{ github.workspace }}/${{ env.report_file }}.sarif
           echo "fileOutput: $fileOutput"
-          kubesec scan --exit-code ${{ env.exit_code }} ${{ env.manifest_path }} --format template --template sarif.tpl > $fileOutput
+          kubesec scan --exit-code ${{ env.exit_code }} ${{ env.manifest_path }} --format template --template ${{ env.template_file }} > $fileOutput
           ls -la
           cat $fileOutput
 
@@ -102,4 +103,4 @@ jobs:
       - name: Upload Kubesec scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: kubesec-results.sarif
+          sarif_file: ${{ github.workspace }}/${{ env.report_file }}.sarif
