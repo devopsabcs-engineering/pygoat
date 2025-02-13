@@ -1,0 +1,68 @@
+# Last applied at: Thu, 13 Feb 2025 13:56:48 GMT
+# DevOps Shield - The ultimate DevSecOps platform designed to secure your DevOps.
+# https://devopsshield.com
+##############################################################
+# This is a DevOps Shield - Application Security - Code Security Template.
+
+# This workflow template uses actions that are not certified by DevOps Shield.
+# They are provided by a third-party and are governed by separate terms of service, privacy policy, and support documentation.
+
+# Use this workflow template for integrating code security into your pipelines and workflows.
+
+# DevOps Shield Workflow Template Details:
+# ------------------------------------------------------------
+# Code: GH_SCA_OSV_SCANNER
+# Name: OSV Scanner
+# DevSecOpsControls: SCA
+# Provider: Google
+# Categories: Code Scanning, Dependency Management, JavaScript, Python, Java, PHP, C#, R, Ruby, Rust, Swift, Go, TypeScript
+# Description:
+# Vulnerability scanner for your dependencies using data provided by https://osv.dev
+# Use OSV-Scanner to find existing vulnerabilities affecting your project's dependencies.
+# Read the official documentation to find out more.
+# For more information:
+# https://google.github.io/osv-scanner/
+# https://github.com/google/osv-scanner
+# ------------------------------------------------------------
+# Source repository: https://github.com/google/osv-scanner-action
+##############################################################
+
+name: OSV Scanner
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  merge_group:
+    branches: [master]
+  schedule:
+    - cron: 0 0 * * 0
+
+permissions:
+  # Require writing security events to upload SARIF file to security tab
+  security-events: write
+  # Read commit contents
+  contents: read
+  # Read actions to get the status of the action run
+  actions: read
+
+jobs:
+  osv-scan-scheduled:
+    if: ${{ github.event_name == 'push' || github.event_name == 'schedule' }}
+    uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@ab8175fc65a74d8c0308f623b1c617a39bdc34fe" # v1.9.2
+    with:
+      # Example of specifying custom arguments
+      scan-args: |-
+        -r
+        --skip-git
+        ./
+  osv-scan-pr:
+    if: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' }}
+    uses: "google/osv-scanner-action/.github/workflows/osv-scanner-reusable-pr.yml@ab8175fc65a74d8c0308f623b1c617a39bdc34fe" # v1.9.2
+    with:
+      # Example of specifying custom arguments
+      scan-args: |-
+        -r
+        --skip-git
+        ./
