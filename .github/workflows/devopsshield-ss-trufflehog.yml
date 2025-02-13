@@ -2,9 +2,9 @@
 # DevOps Shield - The ultimate DevSecOps platform designed to secure your DevOps.
 # https://devopsshield.com
 ##############################################################
-# This is a DevOps Shield - Application Security - Code Security Template. 
+# This is a DevOps Shield - Application Security - Code Security Template.
 
-# This workflow template uses actions that are not certified by DevOps Shield. 
+# This workflow template uses actions that are not certified by DevOps Shield.
 # They are provided by a third-party and are governed by separate terms of service, privacy policy, and support documentation.
 
 # Use this workflow template for integrating code security into your pipelines and workflows.
@@ -16,13 +16,13 @@
 # DevSecOpsControls: SS
 # Provider: Truffle Security Co.
 # Categories: Code Scanning, Secrets
-# Description: 
-# TruffleHog is the most powerful secrets Discovery, Classification, Validation, and Analysis tool. 
-# In this context secret refers to a credential a machine uses to authenticate itself to another machine. 
-# This includes API keys, database passwords, private encryption keys, and more. 
+# Description:
+# TruffleHog is the most powerful secrets Discovery, Classification, Validation, and Analysis tool.
+# In this context secret refers to a credential a machine uses to authenticate itself to another machine.
+# This includes API keys, database passwords, private encryption keys, and more.
 # Find, verify, and analyze leaked credentials.
-# Read the official documentation to find out more. 
-# For more information: 
+# Read the official documentation to find out more.
+# For more information:
 # https://trufflesecurity.com/
 # https://github.com/trufflesecurity/trufflehog
 # ------------------------------------------------------------
@@ -46,14 +46,14 @@ jobs:
 
     permissions:
       contents: read
-     
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
 
-    - name: Run TruffleHog
-      uses: trufflesecurity/trufflehog@v3
-      id: trufflehog
-      with:
-        extra_args: --results=verified,unknown
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run TruffleHog
+        uses: trufflesecurity/trufflehog@3
+        id: trufflehog
+        with:
+          extra_args: --results=verified,unknown
