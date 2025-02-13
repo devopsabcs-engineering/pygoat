@@ -44,6 +44,8 @@ permissions:
   security-events: write
   # Read commit contents
   contents: read
+  # Read actions to get the status of the action run
+  actions: read
 
 jobs:
   osv-scan-scheduled:
