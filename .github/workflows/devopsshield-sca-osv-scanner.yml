@@ -2,9 +2,9 @@
 # DevOps Shield - The ultimate DevSecOps platform designed to secure your DevOps.
 # https://devopsshield.com
 ##############################################################
-# This is a DevOps Shield - Application Security - Code Security Template. 
+# This is a DevOps Shield - Application Security - Code Security Template.
 
-# This workflow template uses actions that are not certified by DevOps Shield. 
+# This workflow template uses actions that are not certified by DevOps Shield.
 # They are provided by a third-party and are governed by separate terms of service, privacy policy, and support documentation.
 
 # Use this workflow template for integrating code security into your pipelines and workflows.
@@ -16,11 +16,11 @@
 # DevSecOpsControls: SCA
 # Provider: Google
 # Categories: Code Scanning, Dependency Management, JavaScript, Python, Java, PHP, C#, R, Ruby, Rust, Swift, Go, TypeScript
-# Description: 
+# Description:
 # Vulnerability scanner for your dependencies using data provided by https://osv.dev
 # Use OSV-Scanner to find existing vulnerabilities affecting your project's dependencies.
-# Read the official documentation to find out more. 
-# For more information: 
+# Read the official documentation to find out more.
+# For more information:
 # https://google.github.io/osv-scanner/
 # https://github.com/google/osv-scanner
 # ------------------------------------------------------------
@@ -31,13 +31,17 @@ name: OSV Scanner
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
   merge_group:
-    branches: [ master ]
+    branches: [master]
   schedule:
     - cron: 0 0 * * 0
+
+permissions:
+  contents: read
+  security-events: write
 
 jobs:
   osv-scan-scheduled:
