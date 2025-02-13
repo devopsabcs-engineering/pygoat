@@ -1,0 +1,71 @@
+# Last applied at: Thu, 13 Feb 2025 15:14:40 GMT
+# DevOps Shield - The ultimate DevSecOps platform designed to secure your DevOps.
+# https://devopsshield.com
+##############################################################
+# This is a DevOps Shield - Application Security - Code Security Template.
+
+# This workflow template uses actions that are not certified by DevOps Shield.
+# They are provided by a third-party and are governed by separate terms of service, privacy policy, and support documentation.
+
+# Use this workflow template for integrating code security into your pipelines and workflows.
+
+# DevOps Shield Workflow Template Details:
+# ------------------------------------------------------------
+# Code: GH_SAST_POWERSHELL
+# Name: PSScriptAnalyzer (PowerShell)
+# DevSecOpsControls: SAST
+# Provider: Microsoft
+# Categories: Code Scanning, PowerShell
+# Description:
+# PSScriptAnalyzer is a static code checker for PowerShell modules and scripts.
+# It checks the quality of PowerShell code by running a set of rules.
+# The rules are based on PowerShell best practices identified by PowerShell Team and the community.
+# It generates DiagnosticResults (errors and warnings) to inform users about potential code defects and suggests possible solutions for improvements.
+# GitHub Action to run PSScriptAnalyzer to your repository and produce a SARIF file.
+# Read the official documentation to find out more.
+# For more information:
+# https://github.com/PowerShell/PSScriptAnalyzer
+# ------------------------------------------------------------
+# Source repository: https://github.com/microsoft/psscriptanalyzer-action
+##############################################################
+
+name: Run PSScriptAnalyzer (PowerShell)
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  schedule:
+    - cron: 0 0 * * 0
+
+jobs:
+  PSScriptAnalyzer-scan:
+    name: Run PSScriptAnalyzer
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read # for actions/checkout to fetch code
+      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+      actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run PSScriptAnalyzer
+        uses: microsoft/psscriptanalyzer-action@6b2948b1944407914a58661c49941824d149734f #v1.1
+        with:
+          # The below set up runs PSScriptAnalyzer to your entire repository and runs some basic security rules.
+          path: .\
+          recurse: true
+          # Include your own basic security rules. Removing this option will run all the rules
+          includeRule: '"PSAvoidGlobalAliases", "PSAvoidUsingConvertToSecureStringWithPlainText"'
+          output: results.sarif
+
+      # Upload the SARIF file generated in the previous step
+      - name: Upload SARIF results file
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: results.sarif
