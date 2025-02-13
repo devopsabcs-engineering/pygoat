@@ -1,0 +1,71 @@
+# Last applied at: Thu, 13 Feb 2025 15:24:57 GMT
+# DevOps Shield - The ultimate DevSecOps platform designed to secure your DevOps.
+# https://devopsshield.com
+##############################################################
+# This is a DevOps Shield - Application Security - Code Security Template.
+
+# This workflow template uses actions that are not certified by DevOps Shield.
+# They are provided by a third-party and are governed by separate terms of service, privacy policy, and support documentation.
+
+# Use this workflow template for integrating code security into your pipelines and workflows.
+
+# DevOps Shield Workflow Template Details:
+# ------------------------------------------------------------
+# Code: GH_CIS_TRIVY
+# Name: Trivy Container Image Scanning
+# DevSecOpsControls: CIS
+# Provider: Aqua Security
+# Categories: Code Scanning, Dockerfile
+# Description:
+# Scan Docker container images for vulnerabilities in OS packages and language dependencies with Trivy from Aqua Security.
+# Trivy is a comprehensive and versatile security scanner.
+# Trivy has scanners that look for security issues, and targets where it can find those issues.
+# Find vulnerabilities, misconfigurations, secrets, SBOM in containers, Kubernetes, code repositories, clouds and more.
+# Read the official documentation to find out more.
+# For more information:
+# https://trivy.dev/latest/
+# https://github.com/aquasecurity/trivy
+# ------------------------------------------------------------
+# Source repository: https://github.com/aquasecurity/trivy-action
+##############################################################
+
+name: Trivy Container Image Scanning
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  schedule:
+    - cron: 0 0 * * 0
+
+jobs:
+  trivy:
+    name: Trivy vulnerability scanner
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read # for actions/checkout to fetch code
+      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+      actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build an image from Dockerfile
+        run: |
+          docker build -t docker.io/my-organization/my-app:${{ github.sha }} .
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.29.0
+        with:
+          image-ref: "docker.io/my-organization/my-app:${{ github.sha }}"
+          format: "sarif"
+          output: "trivy-results.sarif"
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: "trivy-results.sarif"
