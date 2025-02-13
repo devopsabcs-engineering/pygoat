@@ -1,0 +1,59 @@
+# Last applied at: Thu, 13 Feb 2025 19:54:42 GMT
+# DevOps Shield - The ultimate DevSecOps platform designed to secure your DevOps.
+# https://devopsshield.com
+##############################################################
+# This is a DevOps Shield - Application Security - Code Security Template.
+
+# This workflow template uses actions that are not certified by DevOps Shield.
+# They are provided by a third-party and are governed by separate terms of service, privacy policy, and support documentation.
+
+# Use this workflow template for integrating code security into your pipelines and workflows.
+
+# DevOps Shield Workflow Template Details:
+# ------------------------------------------------------------
+# Code: GH_SS_TRUFFLEHOG
+# Name: TruffleHog Secret Scanning
+# DevSecOpsControls: SS
+# Provider: Truffle Security Co.
+# Categories: Code Scanning, Secrets
+# Description:
+# TruffleHog is the most powerful secrets Discovery, Classification, Validation, and Analysis tool.
+# In this context secret refers to a credential a machine uses to authenticate itself to another machine.
+# This includes API keys, database passwords, private encryption keys, and more.
+# Find, verify, and analyze leaked credentials.
+# Read the official documentation to find out more.
+# For more information:
+# https://trufflesecurity.com/
+# https://github.com/trufflesecurity/trufflehog
+# ------------------------------------------------------------
+# Source repository: https://github.com/trufflesecurity/trufflehog?tab=readme-ov-file#octocat-trufflehog-github-action
+##############################################################
+
+name: TruffleHog Secret Scanning
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: 0 0 * * *
+
+jobs:
+  trufflehog-scan:
+    name: TruffleHog Secret Scanning
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run TruffleHog
+        uses: trufflesecurity/trufflehog@main
+        id: trufflehog
+        with:
+          extra_args: --results=verified,unknown
