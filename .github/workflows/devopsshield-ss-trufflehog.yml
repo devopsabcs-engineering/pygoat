@@ -39,7 +39,7 @@ on:
     - cron: 0 0 * * *
 
 jobs:
-  gitleaks:
+  trufflehog-scan:
     name: TruffleHog Secret Scanning
 
     runs-on: ubuntu-latest
