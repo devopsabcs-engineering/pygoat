@@ -1,0 +1,62 @@
+# Last applied at: Fri, 14 Feb 2025 02:09:46 GMT
+# DevOps Shield - The ultimate DevSecOps platform designed to secure your DevOps.
+# https://devopsshield.com
+##############################################################
+# This is a DevOps Shield - Application Security - Code Security Template.
+
+# This workflow template uses actions that are not certified by DevOps Shield.
+# They are provided by a third-party and are governed by separate terms of service, privacy policy, and support documentation.
+
+# Use this workflow template for integrating code security into your pipelines and workflows.
+
+# DevOps Shield Workflow Template Details:
+# ------------------------------------------------------------
+# Code: GH_CST_CHAIN_BENCH
+# Name: Chain Bench SCM Scanning
+# DevSecOpsControls: CST
+# Provider: Aqua Security
+# Categories: Code Scanning
+# Description:
+# Chain-bench is an open-source tool for auditing your software supply chain stack for security compliance
+# based on a new CIS Software Supply Chain benchmark. The auditing focuses on the entire SDLC process,
+# where it can reveal risks from code time into deploy time. To win the race against hackers
+# and protect your sensitive data and customer trust,
+# you need to ensure your code is compliant with your organization's policies.
+# Read the official documentation to find out more.
+# For more information:
+# https://chainbench.dev/latest/
+# https://github.com/aquasecurity/chainbench
+# ------------------------------------------------------------
+# Source repository: https://github.com/aquasecurity/chainbench-action
+##############################################################
+
+name: Chain Bench SCM Scanning according CIS standards
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  schedule:
+    - cron: 0 0 * * 0
+
+jobs:
+  chain_bench_scan_example:
+    name: Chain Bench vulnerability scanner
+
+    runs-on: ubuntu-latest
+
+    # It is required to provide an access token with permission to these scopes: repo(all), read:repo_hook, admin:org_hook, read:org, read:packages
+
+    steps:
+      - name: Chain Bench
+        id: chain-bench
+        uses: aquasecurity/chain-bench-action@v1.0.0
+        with:
+          repository-url: ${{ github.server_url }}/${{ github.repository }} # Compiles to https://github.com/aquasecurity/chain-bench-action
+          github-token: ${{ secrets.PERSONAL_ACCESS_TOKEN_FOR_CHAIN_BENCH }} # It is required to provide an access token with permission to these scopes: repo(all), read:repo_hook, admin:org_hook, read:org, read:packages
+          #scm-platform: github #Optional parameter for dedicated SCM servers
+
+      # Using the github action output from the scan step "chain-bench-result" (JSON so you can run rego/jq against it)
+      - name: Echo
+        run: echo ${{ steps.chain-bench.outputs.chain-bench-result }}
