@@ -2,9 +2,9 @@
 # DevOps Shield - The ultimate DevSecOps platform designed to secure your DevOps.
 # https://devopsshield.com
 ##############################################################
-# This is a DevOps Shield - Application Security - Code Security Template. 
+# This is a DevOps Shield - Application Security - Code Security Template.
 
-# This workflow template uses actions that are not certified by DevOps Shield. 
+# This workflow template uses actions that are not certified by DevOps Shield.
 # They are provided by a third-party and are governed by separate terms of service, privacy policy, and support documentation.
 
 # Use this workflow template for integrating code security into your pipelines and workflows.
@@ -16,16 +16,16 @@
 # DevSecOpsControls: DAST
 # Provider: Checkmarx
 # Categories: Code Scanning, Penetration Testing
-# Description: 
-# Zed Attack Proxy (ZAP) by Checkmarx is a free, open-source penetration testing tool. 
+# Description:
+# Zed Attack Proxy (ZAP) by Checkmarx is a free, open-source penetration testing tool.
 # ZAP is designed specifically for testing web applications and is both flexible and extensible.
-# Automate with ZAP. ZAP provides range of options for security automation. 
-# The world's most widely used web app scanner. Free and open source. A community based GitHub Top 1000 project that anyone can contribute to. 
+# Automate with ZAP. ZAP provides range of options for security automation.
+# The world's most widely used web app scanner. Free and open source. A community based GitHub Top 1000 project that anyone can contribute to.
 # A GitHub Action for running the ZAP Full Scan to perform Dynamic Application Security Testing (DAST).
 # The ZAP full scan action runs the ZAP spider against the specified target (by default with no time limit) followed by an optional ajax spider scan and then a full active scan before reporting the results.
 # WARNING this action will perform attacks on the target website. You should only scan targets that you have permission to test.
-# Read the official documentation to find out more. 
-# For more information: 
+# Read the official documentation to find out more.
+# For more information:
 # https://www.zaproxy.org/
 # https://www.zaproxy.org/docs/
 # https://github.com/zaproxy/
@@ -39,9 +39,12 @@ name: Zed Attack Proxy (ZAP) Full Scan
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   schedule:
     - cron: 0 0 * * 0
+
+env:
+  ZAP_TARGET: "https://www.zaproxy.org/"
 
 jobs:
   zap_scan:
@@ -52,10 +55,10 @@ jobs:
       contents: read
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Run ZAP Scan
-      uses: zaproxy/action-full-scan@v0.12.0
-      id: zap
-      with:
-        target: 'https://www.zaproxy.org/'
+      - name: Run ZAP Scan
+        uses: zaproxy/action-full-scan@v0.12.0
+        id: zap
+        with:
+          target: "${{ env.ZAP_TARGET }}"
