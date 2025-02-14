@@ -30,7 +30,7 @@
 # Source repository: https://github.com/aquasecurity/chainbench-action
 ##############################################################
 
-name: Chain Bench SCM Scanning according CIS standards
+name: Chain Bench SCM Scanning according to CIS standards
 
 on:
   push:
