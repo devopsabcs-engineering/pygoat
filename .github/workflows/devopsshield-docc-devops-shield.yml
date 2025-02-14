@@ -45,8 +45,24 @@ jobs:
   devopsshield:
     runs-on: ubuntu-latest
 
-    # It is required to provide an access token with permission to these scopes:
-    # repo(all), read:repo_hook, admin:org_hook, read:org, read:packages
+    # You may want to provide an access token with permission to these scopes:
+    # repo(all)
+    # workflow
+    # read:packages
+    # read:org
+    # read:public_key
+    # read:repo_hook
+    # admin:org_hook
+    # notifications
+    # read:user
+    # user:email
+    # read:discussion
+    # read:enterprise
+    # read:audit_log
+    # read:network_configurations
+    # read:project
+    # read:gpg_key
+    # read:ssh_signing_key
 
     steps:
       - name: Checkout repository
