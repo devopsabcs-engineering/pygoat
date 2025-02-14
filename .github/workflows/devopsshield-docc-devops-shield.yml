@@ -45,14 +45,8 @@ jobs:
   devopsshield:
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: read
-      issues: read
-      packages: read
-      pull-requests: read
-      repository-projects: read
-      security-events: write
-      statuses: read
+    # It is required to provide an access token with permission to these scopes:
+    # repo(all), read:repo_hook, admin:org_hook, read:org, read:packages
 
     steps:
       - name: Checkout repository
@@ -64,7 +58,7 @@ jobs:
             -v "${{ github.workspace }}:/devopsshield" \
             --rm -t \
             -e dosOrganizationName=${{ github.repository_owner }} \
-            -e dosPatToken=${{ secrets.GITHUB_TOKEN }} \
+            -e dosPatToken=${{ secrets.PERSONAL_ACCESS_TOKEN_FOR_DEVOPS_SHIELD }} \
             -e dosType=GitHub \
             devopsshield/devopsshield
           ls ${{ github.workspace }}
@@ -74,7 +68,7 @@ jobs:
           cp ${{ github.workspace }}/DevOpsShield-SecurityScanner-Report.sarif "${{ github.workspace }}/devops-shield-reports"
           cp ${{ github.workspace }}/DevOpsShield-SecurityScanner-Report.csv "${{ github.workspace }}/devops-shield-reports"
       - name: Upload DevOps Shield Reports
-        uses: actions/upload-artifact@v4.1.0
+        uses: actions/upload-artifact@v4
         with:
           name: devops-shield-reports
           path: "${{ github.workspace }}/devops-shield-reports"
