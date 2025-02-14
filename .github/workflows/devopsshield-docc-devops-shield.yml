@@ -45,6 +45,11 @@ jobs:
   devopsshield:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      # Write access for security-events is only required for customers looking for DevOps Shield results to appear in the codeQL security alerts tab on GitHub (Requires GHAS)
+      security-events: write
+
     # You may want to provide an access token with permission to these scopes:
     # repo(all)
     # workflow
