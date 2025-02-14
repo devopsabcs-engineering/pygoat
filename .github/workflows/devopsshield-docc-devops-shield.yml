@@ -1,0 +1,95 @@
+# Last applied at: Fri, 14 Feb 2025 14:04:15 GMT
+# DevOps Shield - The ultimate DevSecOps platform designed to secure your DevOps.
+# https://devopsshield.com
+##############################################################
+# This is a DevOps Shield - Application Security - Code Security Template.
+
+# This workflow template uses actions that are not certified by DevOps Shield.
+# They are provided by a third-party and are governed by separate terms of service, privacy policy, and support documentation.
+
+# Use this workflow template for integrating code security into your pipelines and workflows.
+
+# DevOps Shield Workflow Template Details:
+# ------------------------------------------------------------
+# Code: GH_DOCC_DevOps_Shield
+# Name: DevOps Shield Security Scanner
+# DevSecOpsControls: DOCC
+# Provider: DevOps Shield
+# Categories: Other
+# Description:
+# DevOps Shield Security Scanner fills the gap between the DevSecOps and Cloud security governance solutions
+# by hardening your Azure DevOps platform configuration and evaluating non-compliant DevOps resources.
+# DevOps Shield Security Scanner
+# An extension for Azure DevOps that adds a build task to run the DevOps Shield CLI
+# Runs the DevOps Shield Docker container image
+# Scans your Azure DevOps project and repository
+# Evaluates 100+ DevOps Controls
+# Exports the assessment results into SARIF and CSV formats
+# For more information:
+# https://marketplace.visualstudio.com/items?itemName=DevOpsShield.DevOpsShield-SecurityScanner
+# https://hub.docker.com/r/devopsshield/devopsshield
+# https://www.devopsshield.com/
+# ------------------------------------------------------------
+# Source repository: https://marketplace.visualstudio.com/items?itemName=DevOpsShield.DevOpsShield-SecurityScanner
+##############################################################
+
+name: DevOps Shield Security Scanner
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  devopsshield:
+    runs-on: ubuntu-latest
+
+    # You may want to provide an access token with permission to these scopes:
+    # repo(all)
+    # workflow
+    # read:packages
+    # read:org
+    # read:public_key
+    # read:repo_hook
+    # admin:org_hook
+    # notifications
+    # read:user
+    # user:email
+    # read:discussion
+    # read:enterprise
+    # read:audit_log
+    # read:network_configurations
+    # read:project
+    # read:gpg_key
+    # read:ssh_signing_key
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run DevOps Shield Security Scanner
+        run: |
+          docker run --name devopsshield \
+            -v "${{ github.workspace }}:/devopsshield" \
+            --rm -t \
+            -e dosOrganizationName=${{ github.repository_owner }} \
+            -e dosPatToken=${{ secrets.PERSONAL_ACCESS_TOKEN_FOR_DEVOPS_SHIELD }} \
+            -e dosType=GitHub \
+            devopsshield/devopsshield
+          ls ${{ github.workspace }}
+          cat ${{ github.workspace }}/DevOpsShield-SecurityScanner-Report.sarif
+          cat ${{ github.workspace }}/DevOpsShield-SecurityScanner-Report.csv
+          mkdir "${{ github.workspace }}/devops-shield-reports"
+          cp ${{ github.workspace }}/DevOpsShield-SecurityScanner-Report.sarif "${{ github.workspace }}/devops-shield-reports"
+          cp ${{ github.workspace }}/DevOpsShield-SecurityScanner-Report.csv "${{ github.workspace }}/devops-shield-reports"
+      - name: Upload DevOps Shield Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: devops-shield-reports
+          path: "${{ github.workspace }}/devops-shield-reports"
+      # Upload alerts to the Security tab - required for DevOps Shield results to appear in the codeQL security alerts tab on GitHub (Requires GHAS)
+      - name: Upload results to Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ${{ github.workspace }}/DevOpsShield-SecurityScanner-Report.sarif
