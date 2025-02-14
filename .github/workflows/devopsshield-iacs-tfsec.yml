@@ -2,9 +2,9 @@
 # DevOps Shield - The ultimate DevSecOps platform designed to secure your DevOps.
 # https://devopsshield.com
 ##############################################################
-# This is a DevOps Shield - Application Security - Code Security Template. 
+# This is a DevOps Shield - Application Security - Code Security Template.
 
-# This workflow template uses actions that are not certified by DevOps Shield. 
+# This workflow template uses actions that are not certified by DevOps Shield.
 # They are provided by a third-party and are governed by separate terms of service, privacy policy, and support documentation.
 
 # Use this workflow template for integrating code security into your pipelines and workflows.
@@ -16,13 +16,13 @@
 # DevSecOpsControls: IACS
 # Provider: Aqua Security
 # Categories: Code Scanning, HCL, Terraform
-# Description: 
+# Description:
 # Tfsec is now part of Trivy. tfsec uses static analysis of your terraform code to spot potential misconfigurations.
 # A static analysis security scanner for your Terraform code. Discover problems with your infrastructure before hackers do.
 # This workflow will run the tfsec sarif check then add the report to the repo for upload.
 # IaC & misconfigurations scanning capabilities.
-# Read the official documentation to find out more. 
-# For more information: 
+# Read the official documentation to find out more.
+# For more information:
 # https://github.com/aquasecurity/tfsec
 # ------------------------------------------------------------
 # Source repository: https://github.com/aquasecurity/tfsec-sarif-action
@@ -32,9 +32,9 @@ name: tfsec IaC Scanning (Terraform)
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
   schedule:
     - cron: 0 0 * * 0
 
@@ -49,16 +49,16 @@ jobs:
       security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
       actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
 
-    steps:      
-    - name: Checkout code
-      uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Run tfsec
-      uses: aquasecurity/tfsec-sarif-action@v0.1.0
-      with:
-        sarif_file: tfsec.sarif
-    
-    - name: Upload SARIF file to GitHub Security tab
-      uses: github/codeql-action/upload-sarif@v3
-      with:
-        sarif_file: tfsec.sarif
+      - name: Run tfsec
+        uses: aquasecurity/tfsec-sarif-action@v0.1.0
+        with:
+          sarif_file: tfsec.sarif
+
+      - name: Upload SARIF file to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: tfsec.sarif
