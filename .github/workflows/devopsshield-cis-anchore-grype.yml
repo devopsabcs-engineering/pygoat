@@ -41,6 +41,8 @@ on:
 
 env:
   fail-build: false # Set to true to fail the build if vulnerabilities are found
+  imageName: "localbuild/testimage"
+  tag: "latest"
 
 jobs:
   anchore-grype-scan:
@@ -60,7 +62,7 @@ jobs:
       - name: Build an image from Dockerfile
         uses: docker/build-push-action@v4
         with:
-          tags: localbuild/testimage:latest
+          tags: "${{ env.imageName }}:${{ env.tag }}"
           push: false
           load: true
 
@@ -68,7 +70,7 @@ jobs:
         uses: anchore/scan-action@v6
         id: scan
         with:
-          image: "localbuild/testimage:latest"
+          image: "${{ env.imageName }}:${{ env.tag }}"
           fail-build: ${{ env.fail-build }}
           severity-cutoff: critical
       - name: Upload Anchore vulnerability report to GitHub Security tab

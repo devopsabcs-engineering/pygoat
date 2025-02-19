@@ -35,6 +35,10 @@ on:
   push:
     branches: [master]
 
+env:
+  imageName: "localbuild/testimage"
+  tag: "latest"
+
 jobs:
   anchore-syft-Scan:
     name: Anchore Syft SBOM Scan
@@ -50,11 +54,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag localbuild/testimage:latest
+        run: docker build . --file Dockerfile --tag ${{ env.imageName }}:${{ env.tag }}
 
       - name: Scan the image and upload dependency results
         uses: anchore/sbom-action@v0
         with:
-          image: "localbuild/testimage:latest"
+          image: "${{ env.imageName }}:${{ env.tag }}"
           artifact-name: image.spdx.json
           dependency-snapshot: true
