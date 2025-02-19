@@ -44,7 +44,7 @@ on:
     - cron: 0 0 * * 0
 
 env:
-  ZAP_TARGET: "https://www.zaproxy.org/"
+  ZAP_TARGET: "https://app-flask-iru5pc6fcyhre.azurewebsites.net/"
 
 jobs:
   zap_scan:
