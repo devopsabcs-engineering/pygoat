@@ -53,6 +53,7 @@ jobs:
 
     permissions:
       contents: read
+      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
 
     steps:
       - uses: actions/checkout@v4
