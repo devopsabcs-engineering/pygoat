@@ -45,11 +45,11 @@ on:
 
 env:
   ZAP_TARGET: "http://127.0.0.1:8080/" # Change this to your target URL
+  buildAndStart: "true" # Change to "true" to build and start the application if not running
   imageName: "localbuild/testimage"
   tag: "latest"
   HOST_PORT: "8080"
   CONTAINER_PORT: "8000"
-  buildAndStart: "true" # Change to "true" to build and start the application if not running
 
 jobs:
   zap_scan:
