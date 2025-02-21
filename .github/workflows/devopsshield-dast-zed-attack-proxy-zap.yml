@@ -64,9 +64,9 @@ jobs:
       - name: Start Application
         run: |
           echo "Building and starting the application..."
-          docker build -f Dockerfile -t pygoat .
+          docker build -f Dockerfile -t ${{ env.imageName }}:${{ env.tag }} .
           echo "Starting the application..."
-          docker run -d --rm -p 8000:8000 ${ env.imageName }:${{ env.tag }}
+          docker run -d --rm -p 8000:8000 ${{ env.imageName }}:${{ env.tag }}
       - name: Run ZAP Scan
         uses: zaproxy/action-full-scan@v0.12.0
         id: zap
