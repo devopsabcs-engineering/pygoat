@@ -44,7 +44,9 @@ on:
     - cron: 0 0 * * 0
 
 env:
-  ZAP_TARGET: "https://app-flask-iru5pc6fcyhre.azurewebsites.net/" # Change this to your target URL
+  ZAP_TARGET: "http://127.0.0.1:8000/" # Change this to your target URL
+  imageName: "localbuild/testimage"
+  tag: "latest"
 
 jobs:
   zap_scan:
@@ -58,7 +60,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
+      # build and start your application here
+      - name: Start Application
+        run: |
+          echo "Building and starting the application..."
+          docker build -f Dockerfile -t pygoat .
+          echo "Starting the application..."
+          docker run -d --rm -p 8000:8000 ${ env.imageName }:${{ env.tag }}
       - name: Run ZAP Scan
         uses: zaproxy/action-full-scan@v0.12.0
         id: zap
