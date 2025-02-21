@@ -49,6 +49,7 @@ env:
   tag: "latest"
   HOST_PORT: "8080"
   CONTAINER_PORT: "8000"
+  buildAndStart: "false" # Change to "true" to build and start the application if not running
 
 jobs:
   zap_scan:
@@ -66,6 +67,7 @@ jobs:
       # conditionally run the build step
       # assuming the application is a Docker container
       - name: Check if application is running, if not, build and start it
+        if: env.buildAndStart == 'true'
         run: |
           if ! curl -s --head --request GET ${{ env.ZAP_TARGET }} | grep "200 OK" > /dev/null; then
             echo "Application is not running. Building and starting the application..."
